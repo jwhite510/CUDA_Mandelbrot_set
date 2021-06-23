@@ -14,6 +14,7 @@ find_package(SFML 2 REQUIRED COMPONENTS network audio graphics window system)
 find_package(CUDA REQUIRED)
 
 # cuda_add_library(cfdtd_wrapper SHARED src/cfdtd_wrapper.cu)
-
-add_executable(a.out src/main.cpp)
-target_link_libraries(a.out ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
+cuda_compile(DRIVER_O src/main.cu OPTIONS -G)
+cuda_add_executable(driver ${DRIVER_O})
+# add_executable(a.out src/main.cu)
+# target_link_libraries(a.out ${SFML_LIBRARIES} ${SFML_DEPENDENCIES})
