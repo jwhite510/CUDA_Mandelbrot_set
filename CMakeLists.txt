@@ -3,7 +3,7 @@ project(projectname)
 
 add_definitions("-std=c++11 -O3 -ffast-math")
 
-set(CMAKE_BUILD_TYPE Debug)
+# set(CMAKE_BUILD_TYPE Debug)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake_modules" ${CMAKE_MODULE_PATH})
@@ -15,6 +15,6 @@ find_package(CUDA REQUIRED)
 
 # cuda_add_library(cfdtd_wrapper SHARED src/cfdtd_wrapper.cu)
 # cuda_compile(DRIVER_O src/cudamandelbrot.cu OPTIONS -G)
-cuda_add_executable(driver src/main.cpp src/cudamandelbrot.cu OPTIONS -G)
+cuda_add_executable(driver src/main.cpp src/cudamandelbrot.cu)
 # add_executable(a.out src/main.cpp)
 target_link_libraries(driver ${SFML_LIBRARIES} ${SFML_DEPENDENCIES} ${DRIVER_O})
