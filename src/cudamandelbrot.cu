@@ -2,6 +2,7 @@
 #include <iostream>
 #include <complex>
 #include "cudamandelbrot.h"
+#include <thrust/complex.h>
 
 using namespace std;
 
@@ -43,6 +44,43 @@ void increment_values(double* d_arr, int n) {
     // d_arr[thread_i] = d_arr[thread_i] + 1;
   }
 }
+__global__
+void mandelbrotgpu(result *d_arr, int W, int H, double *d_x_arr, double *d_y_arr) {
+  int index = blockIdx.x*blockDim.x+threadIdx.x;
+  int stride = blockDim.x*gridDim.x;
+  for(int thread_i = index; thread_i < W * H; thread_i += stride) {
+    // d_arr[thread_i]. = blockIdx.x;
+    // unravel index
+    int i = thread_i / H;
+    int j = thread_i % H;
+    double c_real = d_x_arr[i];
+    double c_imaginary = d_y_arr[j];
+
+    const int num_iterations = 400;
+    const double max_radius = 10000;
+
+    // complex<double> z = complex<double>(0,0);
+    // complex<double> z_next = complex<double>(0,0);
+    // const complex<double> c = complex<double>(c_real, c_imaginary);
+    thrust::complex<float> z = thrust::complex<float>(0,0);
+    thrust::complex<float> z_next = thrust::complex<float>(0,0);
+    const thrust::complex<float> c = thrust::complex<float>(c_real,c_imaginary);
+    d_arr[i * H + j].iterations = 0;
+    while(d_arr[i * H + j].iterations < num_iterations) {
+      z_next = pow(z,2) + c;
+      if (abs(z_next) > max_radius) { break; }
+      z = z_next;
+      d_arr[i * H + j].iterations++;
+    }
+    // decrease error
+    for(int e=0; e < 4; e++) { z = pow(z,2) + c; }
+    d_arr[i * H + j].real = z.real();
+    d_arr[i * H + j].imag = z.imag();
+    // d_arr[i * H + j] = thread_i;
+    // d_arr[thread_i] = d_arr[thread_i] + 1;
+  }
+
+}
 MandelBrotCuda::MandelBrotCuda(int W, int H):W(W),H(H) {
   cout<<"constructor running"<<endl;
   // copy an array to the server and back to host
@@ -69,34 +107,34 @@ void MandelBrotCuda::gpu_calculate(double *x, double *y) {
   //   cout<<x[i]<<" ";
   // }cout<<endl;
 
-  int blocksize = 5;
-  int numBlocks = 3;
+  int blocksize = 1024;
+  int numBlocks = 500;
   // increment_values<<<numBlocks,blocksize>>>(d_arr, W*H);
-  // mandelbrot<<<numBlocks,blocksize>>>(d_arr, W, H, d_x_arr, d_y_arr);
+  cout<<"start gpu"<<endl;
+  mandelbrotgpu<<<numBlocks,blocksize>>>(d_arr, W, H, d_x_arr, d_y_arr);
+  cout<<"end gpu"<<endl;
 
 
   // copy to the host
   cudaMemcpy(h_arr, d_arr, W * H * sizeof(double), cudaMemcpyDeviceToHost);
 
-  // run on cpu
-  cout<<"start"<<endl;
-  for (int i = 0; i < W; i++) {
-    for (int j = 0; j < H; j++) {
-      int iterations;
-      double real;
-      double imag;
-      mandelbrot(x[i], y[j],
-          iterations, // OUT
-          real, // OUT
-          imag); // OUT
-      h_arr[i * H + j].iterations = iterations;
-      h_arr[i * H + j].real = real;
-      h_arr[i * H + j].imag = imag;
-    }
-  }
-  cout<<"finish"<<endl;
-
-
+  // // run on cpu
+  // cout<<"start"<<endl;
+  // for (int i = 0; i < W; i++) {
+  //   for (int j = 0; j < H; j++) {
+  //     int iterations;
+  //     double real;
+  //     double imag;
+  //     mandelbrot(x[i], y[j],
+  //         iterations, // OUT
+  //         real, // OUT
+  //         imag); // OUT
+  //     h_arr[i * H + j].iterations = iterations;
+  //     h_arr[i * H + j].real = real;
+  //     h_arr[i * H + j].imag = imag;
+  //   }
+  // }
+  // cout<<"finish"<<endl;
 
 }
 MandelBrotCuda::~MandelBrotCuda()  {
