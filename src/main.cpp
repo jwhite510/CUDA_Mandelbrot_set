@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <complex>
+// #include "cudamandelbrot.h"
 
 using namespace std;
 

@@ -6,6 +6,7 @@ RUN apt-get install cmake -y
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+RUN apt-get install neovim -y
 RUN apt-get install python3 -y
 RUN apt-get install python3-pip -y
 RUN apt-get install python3-tk -y
