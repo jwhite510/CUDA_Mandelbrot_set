@@ -127,8 +127,8 @@ struct Application
         mouseDragging = 1;
         // set the mouse clicked location
         sf::Vector2i position = sf::Mouse::getPosition();
-        mouse_down_col = position.x;
-        mouse_down_row = position.y;
+        mouse_down_col = position.y;
+        mouse_down_row = position.x;
       }
       if(event.type == sf::Event::MouseButtonReleased) {
         mouseDragging = 0;
@@ -149,8 +149,8 @@ struct Application
     }
     if(mouseDragging) {
       sf::Vector2i position = sf::Mouse::getPosition();
-      int delta_col = position.x - mouse_down_col;
-      int delta_row = position.y - mouse_down_row;
+      int delta_col = position.y - mouse_down_col;
+      int delta_row = position.x - mouse_down_row;
 
       delta_linspace_x = x_span * ((double)delta_row / (double)W);
       delta_linspace_y = x_span * ((double)delta_col / (double)H);
@@ -212,10 +212,10 @@ int main()
         //     real,
         //     imag);
 
-        (*app.pixelgrid)(i,j,0) = real;
-        (*app.pixelgrid)(i,j,1) = imag+iterations;
-        (*app.pixelgrid)(i,j,2) = iterations;
-        (*app.pixelgrid)(i,j,3) = 255;
+        (*app.pixelgrid)(j,i,0) = real;
+        (*app.pixelgrid)(j,i,1) = imag+iterations;
+        (*app.pixelgrid)(j,i,2) = iterations;
+        (*app.pixelgrid)(j,i,3) = 255;
       }
     // draw on screen
     app.DrawPixels();
