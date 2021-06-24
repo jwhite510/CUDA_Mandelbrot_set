@@ -3,7 +3,7 @@
 
 class MandelBrotCuda {
   public:
-  MandelBrotCuda() {};
+  MandelBrotCuda();
 };
 
 #endif

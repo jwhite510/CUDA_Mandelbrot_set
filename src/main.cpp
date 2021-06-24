@@ -183,7 +183,7 @@ struct Application
 int main()
 {
 
-  MandelBrotCuda();
+  MandelBrotCuda mandelbrotcuda;
 
 
   Application app;
