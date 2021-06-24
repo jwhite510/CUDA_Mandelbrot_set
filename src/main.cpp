@@ -5,7 +5,7 @@
 
 using namespace std;
 
-void mandelbrot(double c_real, double c_imaginary, int &iterations, double &real, double &imag)
+void mandelbrot1(double c_real, double c_imaginary, int &iterations, double &real, double &imag)
 {
 
   const int num_iterations = 400;
@@ -33,6 +33,7 @@ void mandelbrot(double c_real, double c_imaginary, int &iterations, double &real
   imag = z.imag();
 
 }
+
 void Linspace(double* arr, double begin, double end, int N)
 {
   double dx = (end - begin) / N;
@@ -203,13 +204,13 @@ int main()
         int iterations;
         double real;
         double imag;
-        // mandelbrot(app.x[i], app.y[j],
-        //     iterations, // OUT
-        //     real, // OUT
-        //     imag); // OUT
         iterations = mandelbrotcuda.h_arr[i * app.H + j].iterations;
         real = mandelbrotcuda.h_arr[i * app.H + j].real;
         imag = mandelbrotcuda.h_arr[i * app.H + j].imag;
+        // mandelbrot1(app.x[i], app.y[j],
+        //     iterations,
+        //     real,
+        //     imag);
 
         (*app.pixelgrid)(i,j,0) = real;
         (*app.pixelgrid)(i,j,1) = imag+iterations;
