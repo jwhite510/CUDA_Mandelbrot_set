@@ -14,44 +14,45 @@ void increment_values(double* d_arr, int n) {
     // d_arr[thread_i] = d_arr[thread_i] + 1;
   }
 }
-MandelBrotCuda::MandelBrotCuda() {
+MandelBrotCuda::MandelBrotCuda(int W, int H):W(W),H(H) {
   cout<<"constructor running"<<endl;
   // copy an array to the server and back to host
 
-  n = 20; // length of the array
-  // allocate memory on the host
-  h_arr = new double[n];
-  for (int i = 0; i < n; i++) {
-    h_arr[i] = i;
-  }
+  // allocate on device:
 
-  cudaMalloc(&d_arr, n*sizeof(double)); // allocate memory on the device
+  // allocate memory on the host for result
+  h_arr = new result[W*H];
+
+  // space for x and y linspace, 2d grid for calculate result
+  cudaMalloc(&d_x_arr, W * sizeof(double)); // allocate memory on the device
+  cudaMalloc(&d_y_arr, H * sizeof(double)); // allocate memory on the device
+  // for (int i = 0; i < n; i++) {
+  //   h_arr[i] = i;
+  // }
+  cudaMalloc(&d_arr, W*H*sizeof(result)); // allocate memory on the device
 }
-void MandelBrotCuda::gpu_calculate() {
+void MandelBrotCuda::gpu_calculate(double *x, double *y) {
+  // copy the x and y to device
+  cudaMemcpy(d_x_arr, x, W * sizeof(double), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_y_arr, y, H * sizeof(double), cudaMemcpyHostToDevice);
   cout<<"gpu_calculate running"<<endl;
-
-  // print before
-  for (int i = 0; i < n; i++) {
-    printf("%-5i ",(int)h_arr[i]);
-  }cout<<endl;
-
-  // copy to the device
-  cudaMemcpy(d_arr, h_arr, n*sizeof(double), cudaMemcpyHostToDevice);
 
   int blocksize = 5;
   int numBlocks = 3;
-  increment_values<<<numBlocks,blocksize>>>(d_arr, n);
+  // increment_values<<<numBlocks,blocksize>>>(d_arr, W*H);
+  // mandelbrot<<<numBlocks,blocksize>>>(d_arr, W, H, d_x_arr, d_y_arr);
 
   // copy to the host
-  cudaMemcpy(h_arr, d_arr, n*sizeof(double), cudaMemcpyDeviceToHost);
-  // print after
-  for (int i = 0; i < n; i++) {
-    printf("%-5i ",(int)h_arr[i]);
-  }cout<<endl;
+  cudaMemcpy(h_arr, d_arr, W * H * sizeof(double), cudaMemcpyDeviceToHost);
+
+  // run on cpu
+
 }
 MandelBrotCuda::~MandelBrotCuda()  {
   delete [] h_arr;
   cudaFree(&d_arr);
+  cudaFree(&d_x_arr);
+  cudaFree(&d_y_arr);
   cout<<"destructor running"<<endl;
 }
 

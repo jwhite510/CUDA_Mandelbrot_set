@@ -186,8 +186,7 @@ int main()
 
 
   Application app;
-  MandelBrotCuda mandelbrotcuda;
-  mandelbrotcuda.gpu_calculate();
+  MandelBrotCuda mandelbrotcuda(app.W, app.H);
   while(app.window->isOpen())
   {
     // capture mouse events
@@ -195,18 +194,22 @@ int main()
 
     // update x and y arrays
     app.DrawCoordinateSpace();
-
+    // copy x and y array to device
+    mandelbrotcuda.gpu_calculate(app.x, app.y);
     for(int i=0; i < app.W; i++)
       for(int j=0; j < app.H; j++) {
 
-        // calculate divergence for mandelbrot set
+        // // calculate divergence for mandelbrot set
         int iterations;
         double real;
         double imag;
-        mandelbrot(app.x[i], app.y[j],
-            iterations, // OUT
-            real, // OUT
-            imag); // OUT
+        // mandelbrot(app.x[i], app.y[j],
+        //     iterations, // OUT
+        //     real, // OUT
+        //     imag); // OUT
+        iterations = mandelbrotcuda.h_arr[i * app.H + j].iterations;
+        real = mandelbrotcuda.h_arr[i * app.H + j].real;
+        imag = mandelbrotcuda.h_arr[i * app.H + j].imag;
 
         (*app.pixelgrid)(i,j,0) = real;
         (*app.pixelgrid)(i,j,1) = imag+iterations;
