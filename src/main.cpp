@@ -92,8 +92,8 @@ struct Application
 
   Application()
   {
-    W = 600;
-    H = 600; // you can change this to full window size later
+    W = 1200;
+    H = 1200; // you can change this to full window size later
 
     delta_linspace_x = 0;
     delta_linspace_y = 0;

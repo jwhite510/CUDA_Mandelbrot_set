@@ -114,27 +114,8 @@ void MandelBrotCuda::gpu_calculate(double *x, double *y) {
   mandelbrotgpu<<<numBlocks,blocksize>>>(d_arr, W, H, d_x_arr, d_y_arr);
   cout<<"end gpu"<<endl;
 
-
   // copy to the host
-  cudaMemcpy(h_arr, d_arr, W * H * sizeof(double), cudaMemcpyDeviceToHost);
-
-  // // run on cpu
-  // cout<<"start"<<endl;
-  // for (int i = 0; i < W; i++) {
-  //   for (int j = 0; j < H; j++) {
-  //     int iterations;
-  //     double real;
-  //     double imag;
-  //     mandelbrot(x[i], y[j],
-  //         iterations, // OUT
-  //         real, // OUT
-  //         imag); // OUT
-  //     h_arr[i * H + j].iterations = iterations;
-  //     h_arr[i * H + j].real = real;
-  //     h_arr[i * H + j].imag = imag;
-  //   }
-  // }
-  // cout<<"finish"<<endl;
+  cudaMemcpy(h_arr, d_arr, W * H * sizeof(result), cudaMemcpyDeviceToHost);
 
 }
 MandelBrotCuda::~MandelBrotCuda()  {
