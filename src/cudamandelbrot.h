@@ -3,7 +3,13 @@
 
 class MandelBrotCuda {
   public:
-  MandelBrotCuda();
+
+    double* h_arr;
+    double* d_arr;
+    int n;
+    MandelBrotCuda();
+    void gpu_calculate();
+    ~MandelBrotCuda();
 };
 
 #endif

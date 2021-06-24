@@ -183,10 +183,11 @@ struct Application
 int main()
 {
 
-  MandelBrotCuda mandelbrotcuda;
 
 
   Application app;
+  MandelBrotCuda mandelbrotcuda;
+  mandelbrotcuda.gpu_calculate();
   while(app.window->isOpen())
   {
     // capture mouse events
