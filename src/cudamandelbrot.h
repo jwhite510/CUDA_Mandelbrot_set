@@ -1,10 +1,11 @@
+#include "params.h"
 #ifndef CUDAMANDELBROT_H
 #define CUDAMANDELBROT_H
 
 struct result {
   int iterations;
-  double real;
-  double imag;
+  mtype real;
+  mtype imag;
 };
 
 class MandelBrotCuda {
@@ -12,12 +13,12 @@ class MandelBrotCuda {
 
     result* h_arr;
     result* d_arr;
-    double* d_x_arr;
-    double* d_y_arr;
+    mtype* d_x_arr;
+    mtype* d_y_arr;
     int W;
     int H;
     MandelBrotCuda(int W, int H);
-    void gpu_calculate(double* x, double* y);
+    void gpu_calculate(mtype* x, mtype* y);
     ~MandelBrotCuda();
 };
 

@@ -3,19 +3,20 @@
 #include <complex>
 #include "cudamandelbrot.h"
 #include <thrust/complex.h>
+#include "params.h"
 
 using namespace std;
 
-void mandelbrot(double c_real, double c_imaginary, int &iterations, double &real, double &imag)
+void mandelbrot(mtype c_real, mtype c_imaginary, int &iterations, mtype &real, mtype &imag)
 {
 
   const int num_iterations = 400;
-  const double max_radius = 10000;
+  const mtype max_radius = 10000;
 
 
-  complex<double> z = complex<double>(0,0);
-  complex<double> z_next = complex<double>(0,0);
-  const complex<double> c = complex<double>(c_real, c_imaginary);
+  complex<mtype> z = complex<mtype>(0,0);
+  complex<mtype> z_next = complex<mtype>(0,0);
+  const complex<mtype> c = complex<mtype>(c_real, c_imaginary);
 
   iterations = 0;
   while(iterations < num_iterations) {
@@ -36,7 +37,7 @@ void mandelbrot(double c_real, double c_imaginary, int &iterations, double &real
 }
 
 __global__
-void increment_values(double* d_arr, int n) {
+void increment_values(mtype* d_arr, int n) {
   int index = blockIdx.x*blockDim.x+threadIdx.x;
   int stride = blockDim.x*gridDim.x;
   for(int thread_i = index; thread_i < n; thread_i += stride) {
@@ -45,7 +46,7 @@ void increment_values(double* d_arr, int n) {
   }
 }
 __global__
-void mandelbrotgpu(result *d_arr, int W, int H, double *d_x_arr, double *d_y_arr) {
+void mandelbrotgpu(result *d_arr, int W, int H, mtype *d_x_arr, mtype *d_y_arr) {
   int index = blockIdx.x*blockDim.x+threadIdx.x;
   int stride = blockDim.x*gridDim.x;
   for(int thread_i = index; thread_i < W * H; thread_i += stride) {
@@ -53,15 +54,15 @@ void mandelbrotgpu(result *d_arr, int W, int H, double *d_x_arr, double *d_y_arr
     // unravel index
     int i = thread_i / H;
     int j = thread_i % H;
-    double c_real = d_x_arr[i];
-    double c_imaginary = d_y_arr[j];
+    mtype c_real = d_x_arr[i];
+    mtype c_imaginary = d_y_arr[j];
 
     const int num_iterations = 400;
-    const double max_radius = 10000;
+    const mtype max_radius = 10000;
 
-    // complex<double> z = complex<double>(0,0);
-    // complex<double> z_next = complex<double>(0,0);
-    // const complex<double> c = complex<double>(c_real, c_imaginary);
+    // complex<mtype> z = complex<mtype>(0,0);
+    // complex<mtype> z_next = complex<mtype>(0,0);
+    // const complex<mtype> c = complex<mtype>(c_real, c_imaginary);
     thrust::complex<float> z = thrust::complex<float>(0,0);
     thrust::complex<float> z_next = thrust::complex<float>(0,0);
     const thrust::complex<float> c = thrust::complex<float>(c_real,c_imaginary);
@@ -91,17 +92,17 @@ MandelBrotCuda::MandelBrotCuda(int W, int H):W(W),H(H) {
   h_arr = new result[W*H];
 
   // space for x and y linspace, 2d grid for calculate result
-  cudaMalloc(&d_x_arr, W * sizeof(double)); // allocate memory on the device
-  cudaMalloc(&d_y_arr, H * sizeof(double)); // allocate memory on the device
+  cudaMalloc(&d_x_arr, W * sizeof(mtype)); // allocate memory on the device
+  cudaMalloc(&d_y_arr, H * sizeof(mtype)); // allocate memory on the device
   // for (int i = 0; i < n; i++) {
   //   h_arr[i] = i;
   // }
   cudaMalloc(&d_arr, W*H*sizeof(result)); // allocate memory on the device
 }
-void MandelBrotCuda::gpu_calculate(double *x, double *y) {
+void MandelBrotCuda::gpu_calculate(mtype *x, mtype *y) {
   // copy the x and y to device
-  cudaMemcpy(d_x_arr, x, W * sizeof(double), cudaMemcpyHostToDevice);
-  cudaMemcpy(d_y_arr, y, H * sizeof(double), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_x_arr, x, W * sizeof(mtype), cudaMemcpyHostToDevice);
+  cudaMemcpy(d_y_arr, y, H * sizeof(mtype), cudaMemcpyHostToDevice);
   // cout<<"gpu_calculate running"<<endl;
   // for(int i=0; i < 10; i++){
   //   cout<<x[i]<<" ";

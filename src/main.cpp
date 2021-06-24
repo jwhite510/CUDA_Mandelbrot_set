@@ -2,19 +2,20 @@
 #include <iostream>
 #include <complex>
 #include "cudamandelbrot.h"
+#include "params.h"
 
 using namespace std;
 
-void mandelbrot1(double c_real, double c_imaginary, int &iterations, double &real, double &imag)
+void mandelbrot1(mtype c_real, mtype c_imaginary, int &iterations, mtype &real, mtype &imag)
 {
 
   const int num_iterations = 400;
-  const double max_radius = 10000;
+  const mtype max_radius = 10000;
 
 
-  complex<double> z = complex<double>(0,0);
-  complex<double> z_next = complex<double>(0,0);
-  const complex<double> c = complex<double>(c_real, c_imaginary);
+  complex<mtype> z = complex<mtype>(0,0);
+  complex<mtype> z_next = complex<mtype>(0,0);
+  const complex<mtype> c = complex<mtype>(c_real, c_imaginary);
 
   iterations = 0;
   while(iterations < num_iterations) {
@@ -34,10 +35,10 @@ void mandelbrot1(double c_real, double c_imaginary, int &iterations, double &rea
 
 }
 
-void Linspace(double* arr, double begin, double end, int N)
+void Linspace(mtype* arr, mtype begin, mtype end, int N)
 {
-  double dx = (end - begin) / N;
-  double value = begin;
+  mtype dx = (end - begin) / N;
+  mtype value = begin;
   for(int i=0; i < N; i++) {
     arr[i] = value;
     value+=dx;
@@ -78,17 +79,17 @@ struct Application
   sf::Texture* texture;
   sf::Sprite* sprite;
   int mouseDragging = 0;
-  double center_x;
+  mtype center_x;
   int center_col_delta;
-  double center_y;
+  mtype center_y;
   int center_row_delta;
   int mouse_down_col;
   int mouse_down_row;
-  double x_span;
-  double* x;
-  double* y;
-  double delta_linspace_x;
-  double delta_linspace_y;
+  mtype x_span;
+  mtype* x;
+  mtype* y;
+  mtype delta_linspace_x;
+  mtype delta_linspace_y;
 
   Application()
   {
@@ -98,8 +99,8 @@ struct Application
     delta_linspace_x = 0;
     delta_linspace_y = 0;
 
-    x = new double[W];
-    y = new double[H];
+    x = new mtype[W];
+    y = new mtype[H];
     x_span = 3;
     center_x = 0;
     center_y = 0;
@@ -141,8 +142,8 @@ struct Application
       if(event.type == sf::Event::MouseWheelScrolled) {
         cout << "mouse scrolling" << endl;
         cout << event.mouseWheelScroll.delta << endl;
-        double deltazoom = ((double)event.mouseWheelScroll.delta / 10);
-        double zoomlevel = 1 + deltazoom;
+        mtype deltazoom = ((mtype)event.mouseWheelScroll.delta / 10);
+        mtype zoomlevel = 1 + deltazoom;
         std::cout << "deltazoom" << " => " << deltazoom << std::endl;
         x_span *= zoomlevel;
       }
@@ -152,8 +153,8 @@ struct Application
       int delta_col = position.y - mouse_down_col;
       int delta_row = position.x - mouse_down_row;
 
-      delta_linspace_x = x_span * ((double)delta_row / (double)W);
-      delta_linspace_y = x_span * ((double)delta_col / (double)H);
+      delta_linspace_x = x_span * ((mtype)delta_row / (mtype)W);
+      delta_linspace_y = x_span * ((mtype)delta_col / (mtype)H);
     }
   }
   void DrawCoordinateSpace()
@@ -202,8 +203,8 @@ int main()
 
         // // calculate divergence for mandelbrot set
         int iterations;
-        double real;
-        double imag;
+        mtype real;
+        mtype imag;
         iterations = mandelbrotcuda.h_arr[i * app.H + j].iterations;
         real = mandelbrotcuda.h_arr[i * app.H + j].real;
         imag = mandelbrotcuda.h_arr[i * app.H + j].imag;
