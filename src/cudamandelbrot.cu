@@ -9,8 +9,8 @@ void increment_values(double* d_arr, int n) {
   int index = blockIdx.x*blockDim.x+threadIdx.x;
   int stride = blockDim.x*gridDim.x;
   for(int thread_i = index; thread_i < n; thread_i += stride) {
-    // d_arr[thread_i] = blockIdx.x;
-    d_arr[thread_i] = d_arr[thread_i] + 1;
+    d_arr[thread_i] = blockIdx.x;
+    // d_arr[thread_i] = d_arr[thread_i] + 1;
   }
 }
 

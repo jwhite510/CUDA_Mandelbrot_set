@@ -1,7 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <complex>
-// #include "cudamandelbrot.h"
+#include "cudamandelbrot.h"
 
 using namespace std;
 
@@ -182,6 +182,10 @@ struct Application
 
 int main()
 {
+
+  runcudathings();
+
+
   Application app;
   while(app.window->isOpen())
   {
