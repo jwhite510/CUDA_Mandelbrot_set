@@ -1,7 +1,10 @@
 #ifndef CUDAMANDELBROT_H
 #define CUDAMANDELBROT_H
 
-void runcudathings();
+class MandelBrotCuda {
+  public:
+  MandelBrotCuda() {};
+};
 
 #endif
 

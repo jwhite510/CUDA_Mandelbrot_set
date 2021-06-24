@@ -183,7 +183,7 @@ struct Application
 int main()
 {
 
-  runcudathings();
+  MandelBrotCuda();
 
 
   Application app;
